@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Available Items</h2>
+
+<div class="item-list">
+  {% for item in items %}
+    <div class="item-card">
+      <img src="{{ item.image_url }}" alt="{{ item.name }}" width="200">
+      <h3>{{ item.name }}</h3>
+      <p>{{ item.description }}</p>
+      <p>Status: {{ item.status.value }}</p>
+      <a href="{{ url_for('shop.post', item_id=item.id) }}">View Details</a>
+    </div>
+  {% else %}
+    <p>No items available.</p>
+  {% endfor %}
+</div>
+
+<div class="pagination">
+  {% if pagination.has_prev %}
+    <a href="{{ url_for('shop.home', page=pagination.prev_num) }}">Previous</a>
+  {% endif %}
+
+  <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+
+  {% if pagination.has_next %}
+    <a href="{{ url_for('shop.home', page=pagination.next_num) }}">Next</a>
+  {% endif %}
+</div>
+{% endblock %}

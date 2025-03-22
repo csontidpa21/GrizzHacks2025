@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="item-detail">
+  <img src="{{ item.image_url }}" alt="{{ item.name }}">
+  <h2>{{ item.name }}</h2>
+  <p>{{ item.description }}</p>
+  <p>Status: {{ item.status.value }}</p>
+
+  <h4>Comments:</h4>
+  {% for comment in item.comments %}
+    <p>{{ comment.content }}</p>
+  {% endfor %}
+
+  <form method="POST" action="{{ url_for('shop.comment_post', item_id=item.id) }}">
+    <textarea name="content"></textarea>
+    <button type="submit">Add Comment</button>
+  </form>
+</div>
+{% endblock %}

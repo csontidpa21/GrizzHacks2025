@@ -4,12 +4,9 @@ import requests
 from .extensions import db, bcrypt
 from .models import User
 from .forms import RegistrationForm, LoginForm
-from app.controller import create_user, get_user_by_username, get_user_by_id
+from app.controller import create_user, get_user_by_username
 
 auth = Blueprint('auth', __name__)
-# TODO
-
-
 
 def get_geoip_location(ip_address):
     try:
@@ -41,7 +38,7 @@ def register():
             )
             flash('Account created successfully!', 'success')
             login_user(user)
-            return redirect(url_for('main.index'))
+            return redirect(url_for('shop.home'))  # Redirect to shop.home after registration
         except ValueError as e:
             flash(str(e), 'danger')
     return render_template('register.html', form=form)
@@ -54,7 +51,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
             login_user(user)
             flash('Logged in successfully.', 'success')
-            return redirect(url_for('main.index'))
+            return redirect(url_for('shop.home'))  # Redirect to shop.home after login
         else:
             flash('Login unsuccessful. Please check email and password.', 'danger')
     return render_template('login.html', form=form)

@@ -1,13 +1,18 @@
 from .extensions import db, login_manager
-from sqlalchemy import func, Enum
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import func, Enum, JSON
+from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from flask_login import UserMixin
 import enum
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    try:
+        user_uuid = uuid.UUID(user_id)
+        return User.query.get(user_uuid)
+    except (ValueError, TypeError):
+        return None
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -18,7 +23,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(256), nullable=False)
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
-    preferences = db.Column(JSONB, nullable=True)
+    preferences = db.Column(JSON, nullable=True)  # <-- updated to generic JSON
     gamification_points = db.Column(db.Integer, default=0, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
 
@@ -46,6 +51,7 @@ class Item(db.Model):
     condition = db.Column(Enum(ItemConditionEnum), nullable=False, default=ItemConditionEnum.USED)
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
+    image_url = db.Column(db.String(256), nullable=True)
     status = db.Column(Enum(ItemStatusEnum), default=ItemStatusEnum.AVAILABLE, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
 
@@ -66,3 +72,12 @@ class Swap(db.Model):
 
     item_requested = db.relationship('Item', foreign_keys=[item_requested_id])
     item_offered = db.relationship('Item', foreign_keys=[item_offered_id])
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    item_id = db.Column(UUID(as_uuid=True), db.ForeignKey('items.id'), nullable=False)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=func.now(), nullable=False)

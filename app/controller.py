@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import User, Item, Swap, ItemStatusEnum, SwapStatusEnum
+from app.models import User, Item, Swap, ItemStatusEnum, SwapStatusEnum, Comment
 from sqlalchemy import func
 # Functions:
 # create_user: creates a new user in the database
@@ -207,3 +207,25 @@ def complete_swap(swap_id):
 
     db.session.commit()
     return swap
+
+def get_paginated_items(page=1, per_page=10):
+    return Item.query.order_by(Item.created_at.desc()).paginate(page=page, per_page=per_page)
+
+def get_paginated_swaps(page=1, per_page=10):
+    return Swap.query.order_by(Swap.initiated_at.desc()).paginate(page=page, per_page=per_page)
+
+def edit_item(item_id, **kwargs):
+    item = Item.query.get(item_id)
+    if not item:
+        raise ValueError("Item not found.")
+    for k, v in kwargs.items():
+        if hasattr(item, k):
+            setattr(item, k, v)
+    db.session.commit()
+    return item
+
+def add_comment(item_id, user_id, content):
+    comment = Comment(item_id=item_id, user_id=user_id, content=content)
+    db.session.add(comment)
+    db.session.commit()
+    return comment
