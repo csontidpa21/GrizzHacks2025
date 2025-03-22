@@ -16,6 +16,7 @@ Hi
 - `app/controller.py`: Contains all the functions to interface with the database (create users, deleted users etc). CRUD operations
 - `app/auth.py`: This contains the `/auth` blueprint for handling user registration/authentication etc.
 - `app/templates/*`: Contains all HTML templates/files
+- `app/shop.py`: Contains functionality for controlling the web shop.
 
 To install packages:
 ```bash
