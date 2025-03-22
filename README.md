@@ -153,14 +153,6 @@ EcoSwap/
 
 ---
 
-## Testing
-Run tests with pytest:
-```sh
-pytest
-```
-
----
-
 ## Contributing
 1. Fork repository
 2. Create branch: `git checkout -b feature/new-feature`
