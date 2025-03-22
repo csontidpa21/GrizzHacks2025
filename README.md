@@ -29,3 +29,12 @@ Run
 ```bash
 python run.py
 ```
+
+### Database Schema
+
+**Tables**
+- `items`
+  - 
+- `users`
+- `comments`
+- `swaps`
