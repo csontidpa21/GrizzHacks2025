@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to My Flask App{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <h1>Welcome to My Flask App</h1>
+    <p>Your gateway to a sleek and professional Flask experience.</p>
+    {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.register') }}" class="btn-hero"><i class="fa-solid fa-user-plus"></i> Get Started</a>
+    {% endif %}
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="feature">
+        <i class="fa-solid fa-lock feature-icon"></i>
+        <h3>Secure Authentication</h3>
+        <p>Advanced security with hashed passwords and secure session management.</p>
+    </div>
+    <div class="feature">
+        <i class="fa-solid fa-location-dot feature-icon"></i>
+        <h3>Geo-location Integration</h3>
+        <p>Automatically detect user locations for enhanced personalization.</p>
+    </div>
+    <div class="feature">
+        <i class="fa-solid fa-database feature-icon"></i>
+        <h3>Scalable Database</h3>
+        <p>Robust PostgreSQL or SQLite integration for easy data management.</p>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta">
+    <h2>Ready to dive in?</h2>
+    {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.register') }}" class="btn-cta">Register Now</a>
+    {% else %}
+        <a href="#" class="btn-cta">Go to Dashboard</a>
+    {% endif %}
+</section>
+{% endblock %}
