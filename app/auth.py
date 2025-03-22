@@ -26,7 +26,7 @@ def get_geoip_location(ip_address):
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_pw = bcrypt.generate_password_hash(form.password.data, 100_000).decode('utf-8')
+        hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         
         user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         latitude, longitude = get_geoip_location(user_ip)
