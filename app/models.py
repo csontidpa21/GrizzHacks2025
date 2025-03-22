@@ -1,8 +1,9 @@
 from .extensions import db, login_manager
-from sqlalchemy import func
+from sqlalchemy import func, Enum
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 import uuid
 from flask_login import UserMixin
+import enum
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -11,7 +12,6 @@ def load_user(user_id):
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
-    # Columns (Data attributes)
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = db.Column(db.String(64), unique=True, index=True, nullable=False)
     email = db.Column(db.String(120), unique=True, index=True, nullable=False)
@@ -22,36 +22,47 @@ class User(db.Model, UserMixin):
     gamification_points = db.Column(db.Integer, default=0, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
 
-    # Representation (useful for debugging)
-    def __repr__(self):
-        return f'<User {self.username}>'
+    items = db.relationship('Item', backref='owner', lazy='dynamic')
 
-    # Helper methods (Simple logic for single-instance manipulation)
-    def set_location(self, latitude: float, longitude: float):
-        self.latitude = latitude
-        self.longitude = longitude
+class ItemConditionEnum(enum.Enum):
+    NEW = 'New'
+    LIKE_NEW = 'Like New'
+    USED = 'Used'
+    DAMAGED = 'Damaged'
 
-    def get_location(self):
-        return {"latitude": self.latitude, "longitude": self.longitude}
+class ItemStatusEnum(enum.Enum):
+    AVAILABLE = 'Available'
+    RESERVED = 'Reserved'
+    SWAPPED = 'Swapped'
 
-    def set_preferences(self, preferences: dict):
-        self.preferences = preferences
+class Item(db.Model):
+    __tablename__ = 'items'
 
-    def get_preferences(self):
-        return self.preferences
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(64), nullable=False)
+    description = db.Column(db.String(256), nullable=False)
+    category = db.Column(db.String(50), nullable=True)
+    condition = db.Column(Enum(ItemConditionEnum), nullable=False, default=ItemConditionEnum.USED)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
+    status = db.Column(Enum(ItemStatusEnum), default=ItemStatusEnum.AVAILABLE, nullable=False)
+    created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
 
-    
+class SwapStatusEnum(enum.Enum):
+    PENDING = 'Pending'
+    ACCEPTED = 'Accepted'
+    COMPLETED = 'Completed'
+    CANCELLED = 'Cancelled'
 
-class Items(db.Model):
-    id = db.column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = db.Column
-    pass
+class Swap(db.Model):
+    __tablename__ = 'swaps'
 
-class Swaps(db.Model):
-    '''
-    id (UUID, PK)
-    item_request_id (FK -> Items)
-    item_offered_id (FK -> Items)
-    status (Enum: Pending, accepted, completed cancelled)
-    initiated_at (DateTime)
-    '''
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    item_requested_id = db.Column(UUID(as_uuid=True), db.ForeignKey('items.id'), nullable=False)
+    item_offered_id = db.Column(UUID(as_uuid=True), db.ForeignKey('items.id'), nullable=False)
+    status = db.Column(Enum(SwapStatusEnum), default=SwapStatusEnum.PENDING, nullable=False)
+    initiated_at = db.Column(db.DateTime, default=func.now(), nullable=False)
+
+    item_requested = db.relationship('Item', foreign_keys=[item_requested_id])
+    item_offered = db.relationship('Item', foreign_keys=[item_offered_id])

@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import User
+from app.models import User, Item, Swap, ItemStatusEnum, SwapStatusEnum
 from sqlalchemy import func
 # Functions:
 # create_user: creates a new user in the database
@@ -103,3 +103,107 @@ def get_users_by_location(latitude, longitude, radius_km=10, limit=50):
         for user in nearby_users
     ]
 
+
+
+# ---------------- Item CRUD Operations ----------------
+def create_item(user_id, name, description, category, condition, latitude, longitude):
+    item = Item(user_id=user_id, name=name, description=description,
+                category=category, condition=condition,
+                latitude=latitude, longitude=longitude)
+    db.session.add(item)
+    db.session.commit()
+    return item
+
+def get_item_by_id(item_id):
+    return Item.query.get(item_id)
+
+def update_item(item_id, **kwargs):
+    item = get_item_by_id(item_id)
+    if not item:
+        raise ValueError("Item not found.")
+    for key, value in kwargs.items():
+        if hasattr(item, key):
+            setattr(item, key, value)
+    db.session.commit()
+    return item
+
+def delete_item(item_id):
+    item = get_item_by_id(item_id)
+    if not item:
+        raise ValueError("Item not found.")
+    db.session.delete(item)
+    db.session.commit()
+    return True
+
+# ---------------- Swap CRUD Operations ----------------
+def request_swap(item_requested_id, item_offered_id):
+    swap = Swap(item_requested_id=item_requested_id,
+                item_offered_id=item_offered_id,
+                status=SwapStatusEnum.PENDING)
+    db.session.add(swap)
+    db.session.commit()
+    return swap
+
+def respond_to_swap(swap_id, status):
+    swap = Swap.query.get(swap_id)
+    if swap:
+        swap.status = status
+        db.session.commit()
+    return swap
+
+# ---------------- Queries & Filtering ----------------
+def get_all_items(status='Available', limit=100):
+    return Item.query.filter_by(status=status).limit(limit).all()
+
+def get_items_by_user(user_id, limit=50):
+    return Item.query.filter_by(user_id=user_id).limit(limit).all()
+
+def get_items_by_location(latitude, longitude, radius_km=10, limit=50):
+    EARTH_RADIUS_KM = 6371.0
+    lat_rad = func.radians(latitude)
+    lon_rad = func.radians(longitude)
+
+    distance_expression = EARTH_RADIUS_KM * func.acos(
+        func.cos(lat_rad) * func.cos(func.radians(Item.latitude)) *
+        func.cos(func.radians(Item.longitude) - lon_rad) +
+        func.sin(lat_rad) * func.sin(func.radians(Item.latitude))
+    )
+
+    nearby_items = Item.query \
+        .filter(Item.latitude.isnot(None), Item.longitude.isnot(None)) \
+        .add_columns(distance_expression.label("distance")) \
+        .having(distance_expression <= radius_km) \
+        .order_by("distance") \
+        .limit(limit).all()
+
+    return [
+        {
+            "id": item.Item.id,
+            "name": item.Item.name,
+            "description": item.Item.description,
+            "distance_km": round(item.distance, 2),
+            "location": {"latitude": item.Item.latitude, "longitude": item.Item.longitude},
+            "condition": item.Item.condition.value,
+            "status": item.Item.status.value
+        }
+        for item in nearby_items
+    ]
+
+def get_swaps_by_user(user_id, limit=50):
+    return Swap.query.join(Item, Swap.item_requested_id == Item.id) \
+        .filter(Item.user_id == user_id) \
+        .limit(limit).all()
+
+def complete_swap(swap_id):
+    swap = Swap.query.get(swap_id)
+    if not swap:
+        raise ValueError("Swap not found.")
+    swap.status = SwapStatusEnum.COMPLETED
+    swap.item_requested.status = ItemStatusEnum.SWAPPED
+    swap.item_offered.status = ItemStatusEnum.SWAPPED
+
+    swap.item_requested.owner.gamification_points += 10
+    swap.item_offered.owner.gamification_points += 10
+
+    db.session.commit()
+    return swap

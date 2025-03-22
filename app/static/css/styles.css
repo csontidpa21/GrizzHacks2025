@@ -1,5 +1,5 @@
 :root {
-    --primary: #5865F2;
+    --primary: #6658f2;
     --background: #FFFFFF;
     --text: #333333;
     --secondary-bg: #f4f7fc;
@@ -7,7 +7,7 @@
 }
 
 [data-theme="dark"] {
-    --primary: #5865F2;
+    --primary: #4b3fc4;
     --background: #1A1A1D;
     --text: #EAEAEA;
     --secondary-bg: #242629;
@@ -28,24 +28,35 @@ body {
     padding: 0 20px;
 }
 
+/* NAVBAR FIXES HERE */
 .navbar {
     background-color: var(--primary);
     color: #fff;
-    padding: 1rem 0;
+    padding: 0.8rem 0;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .navbar .logo {
     font-weight: 600;
     font-size: 1.6rem;
+    display: flex;
+    align-items: center;
 }
 
 .nav-links {
     list-style: none;
-    float: right;
     display: flex;
     align-items: center;
     gap: 15px;
     margin: 0;
+    padding: 0;
 }
 
 .nav-links a {
@@ -59,11 +70,13 @@ body {
 }
 
 .btn-theme {
-    background: none;
+    background: transparent;
     border: none;
     color: #fff;
     font-size: 1.2rem;
     cursor: pointer;
+    padding: 5px;
+    margin-left: 5px;
 }
 
 .hero {

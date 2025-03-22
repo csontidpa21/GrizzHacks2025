@@ -18,7 +18,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="logo">
-                <i class="fa-solid fa-layer-group"></i> My Flask App
+                <i class="fa-solid fa-layer-group"></i>&nbsp;My Flask App
             </div>
             <ul class="nav-links">
                 <li><a href="{{ url_for('main.index') }}">Home</a></li>
@@ -32,6 +32,7 @@
             </ul>
         </div>
     </nav>
+`    
 
     <main class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
