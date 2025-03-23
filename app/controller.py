@@ -115,7 +115,9 @@ def create_item(user_id, name, description, category, condition, latitude, longi
     return item
 
 def get_item_by_id(item_id):
-    return Item.query.get(item_id)
+    return Item.query \
+        .options(db.joinedload(Item.owner), db.joinedload(Item.comments).joinedload(Comment.user)) \
+        .filter_by(id=item_id).first()
 
 def update_item(item_id, **kwargs):
     item = get_item_by_id(item_id)

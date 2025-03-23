@@ -29,7 +29,7 @@ def create_sample_items(user):
             'category': 'Electronics',
             'condition': ItemConditionEnum.NEW,
             'status': ItemStatusEnum.AVAILABLE,
-            'image_url': 'https://via.placeholder.com/400x400.png?text=iPhone+Charger'
+            'image_url': 'https://img.casebus.com/upload/product/90064/90064/35W-Type-C-Charger-1.jpg'
         },
         {
             'name': 'Mountain Bike',
@@ -37,7 +37,7 @@ def create_sample_items(user):
             'category': 'Sports',
             'condition': ItemConditionEnum.LIKE_NEW,
             'status': ItemStatusEnum.AVAILABLE,
-            'image_url': 'https://via.placeholder.com/400x400.png?text=Mountain+Bike'
+            'image_url': 'https://i5.walmartimages.com/asr/3e93bdb8-f247-4ae2-898a-e03fe12a5472.c6b499258d504157384035a890ee022e.jpeg?odnHeight=768&odnWidth=768&odnBg=FFFFFF'
         },
         {
             'name': 'Vintage Guitar',
@@ -45,7 +45,7 @@ def create_sample_items(user):
             'category': 'Music',
             'condition': ItemConditionEnum.USED,
             'status': ItemStatusEnum.RESERVED,
-            'image_url': 'https://via.placeholder.com/400x400.png?text=Vintage+Guitar'
+            'image_url': 'https://cdn.mos.cms.futurecdn.net/xUmiWSrVN5RSjRw3htM5rL.jpg'
         },
     ]
 

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint
 from .models import User
 from .extensions import db
 from flask import render_template

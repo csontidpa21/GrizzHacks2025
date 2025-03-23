@@ -1,20 +1,46 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ item.name }}{% endblock %}
+
 {% block content %}
-<div class="item-detail">
-  <img src="{{ item.image_url }}" alt="{{ item.name }}">
-  <h2>{{ item.name }}</h2>
-  <p>{{ item.description }}</p>
-  <p>Status: {{ item.status.value }}</p>
+<div class="item-container">
+  <div class="item-image">
+    <img src="{{ item.image_url }}" alt="{{ item.name }}">
+  </div>
 
-  <h4>Comments:</h4>
-  {% for comment in item.comments %}
-    <p>{{ comment.content }}</p>
-  {% endfor %}
+  <div class="item-details">
+    <h1>{{ item.name }}</h1>
+    <p class="item-category"><strong>Category:</strong> {{ item.category or 'Uncategorized' }}</p>
+    <p class="item-condition"><strong>Condition:</strong> {{ item.condition.value }}</p>
+    <p class="item-status"><strong>Status:</strong> {{ item.status.value }}</p>
+    <p class="item-description">{{ item.description }}</p>
 
-  <form method="POST" action="{{ url_for('shop.comment_post', item_id=item.id) }}">
-    <textarea name="content"></textarea>
-    <button type="submit">Add Comment</button>
+    <div class="item-owner">
+      <strong>Listed by:</strong> {{ item.owner.username }} <br>
+      <strong>Location:</strong> {{ item.latitude | round(3) }}, {{ item.longitude | round(3) }}
+    </div>
+  </div>
+</div>
+
+<div class="comments-section">
+  <h3>Comments</h3>
+  {% if item.comments %}
+    <div class="comment-list">
+      {% for comment in item.comments %}
+        <div class="comment">
+          <p class="comment-author">{{ comment.user.username }}</p>
+          <p>{{ comment.content }}</p>
+          <span class="comment-date">{{ comment.created_at.strftime('%B %d, %Y') }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No comments yet.</p>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('shop.comment_post', item_id=item.id) }}" class="comment-form">
+    <textarea name="content" placeholder="Write a comment..." required></textarea>
+    <button type="submit">Post Comment</button>
   </form>
 </div>
 {% endblock %}

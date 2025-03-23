@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
     preferences = db.Column(JSON, nullable=True)  # <-- updated to generic JSON
     gamification_points = db.Column(db.Integer, default=0, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
-
+    comments = db.relationship('Comment', backref='user', lazy='dynamic')
     items = db.relationship('Item', backref='owner', lazy='dynamic')
 
 class ItemConditionEnum(enum.Enum):
@@ -54,6 +54,10 @@ class Item(db.Model):
     image_url = db.Column(db.String(256), nullable=True)
     status = db.Column(Enum(ItemStatusEnum), default=ItemStatusEnum.AVAILABLE, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
+    
+    # Updated Relationship
+    comments = db.relationship('Comment', backref='item', lazy='select')  # Fix here
+
 
 class SwapStatusEnum(enum.Enum):
     PENDING = 'Pending'
