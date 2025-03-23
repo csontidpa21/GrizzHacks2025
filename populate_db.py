@@ -7,10 +7,10 @@ import random
 app = create_app()
 
 def create_sample_user():
-    password_hash = bcrypt.generate_password_hash('Password123!').decode('utf-8')
+    password_hash = bcrypt.generate_password_hash('password').decode('utf-8')
     user = User(
         id=uuid.uuid4(),
-        username='testuser',
+        username='user',
         email='testuser@example.com',
         password_hash=password_hash,
         latitude=42.3314,

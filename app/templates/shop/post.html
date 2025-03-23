@@ -14,6 +14,7 @@
     <p class="item-condition"><strong>Condition:</strong> {{ item.condition.value }}</p>
     <p class="item-status"><strong>Status:</strong> {{ item.status.value }}</p>
     <p class="item-description">{{ item.description }}</p>
+    <a href="{{ url_for('shop.request_swap', item_requested_id=item.id) }}" class="btn">Request Swap</a>
 
     <div class="item-owner">
       <strong>Listed by:</strong> {{ item.owner.username }} <br>
@@ -42,5 +43,6 @@
     <textarea name="content" placeholder="Write a comment..." required></textarea>
     <button type="submit">Post Comment</button>
   </form>
+  
 </div>
 {% endblock %}

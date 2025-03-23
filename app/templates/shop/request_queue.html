@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Requested Items{% endblock %}
+
+{% block content %}
+<h2>Requested Items Queue</h2>
+
+<div class="item-list">
+  {% for request in requests %}
+    <div class="item-card">
+      <h3>{{ request.name }}</h3>
+      <p>{{ request.description }}</p>
+      <p><strong>Requested by:</strong> {{ request.user.username }}</p>
+      <p><small>{{ request.created_at.strftime('%b %d, %Y') }}</small></p>
+    </div>
+  {% else %}
+    <p>No item requests yet.</p>
+  {% endfor %}
+</div>
+
+<a href="{{ url_for('shop.request_item') }}" class="btn">Request an Item</a>
+{% endblock %}

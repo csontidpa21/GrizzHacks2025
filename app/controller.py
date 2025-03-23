@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import User, Item, Swap, ItemStatusEnum, SwapStatusEnum, Comment
+from app.models import User, Item, Swap, ItemStatusEnum, SwapStatusEnum, Comment, SwapMethodEnum, RequestedItem
 from sqlalchemy import func
 # Functions:
 # create_user: creates a new user in the database
@@ -7,6 +7,8 @@ from sqlalchemy import func
 # update_user_preferences
 def get_user_by_id(user_id):
     return User.query.get(user_id)
+
+
 
 def create_user(username, email, password_hash, latitude=None, longitude=None, preferences=None):
     # Check for existing user
@@ -103,13 +105,10 @@ def get_users_by_location(latitude, longitude, radius_km=10, limit=50):
         for user in nearby_users
     ]
 
-
-
-# ---------------- Item CRUD Operations ----------------
-def create_item(user_id, name, description, category, condition, latitude, longitude):
+def create_item(user_id, name, description, category, condition, latitude, longitude, image_url):
     item = Item(user_id=user_id, name=name, description=description,
                 category=category, condition=condition,
-                latitude=latitude, longitude=longitude)
+                latitude=latitude, longitude=longitude, image_url=image_url)
     db.session.add(item)
     db.session.commit()
     return item
@@ -137,14 +136,6 @@ def delete_item(item_id):
     db.session.commit()
     return True
 
-# ---------------- Swap CRUD Operations ----------------
-def request_swap(item_requested_id, item_offered_id):
-    swap = Swap(item_requested_id=item_requested_id,
-                item_offered_id=item_offered_id,
-                status=SwapStatusEnum.PENDING)
-    db.session.add(swap)
-    db.session.commit()
-    return swap
 
 def respond_to_swap(swap_id, status):
     swap = Swap.query.get(swap_id)
@@ -153,7 +144,7 @@ def respond_to_swap(swap_id, status):
         db.session.commit()
     return swap
 
-# ---------------- Queries & Filtering ----------------
+
 def get_all_items(status='Available', limit=100):
     return Item.query.filter_by(status=status).limit(limit).all()
 
@@ -231,3 +222,31 @@ def add_comment(item_id, user_id, content):
     db.session.add(comment)
     db.session.commit()
     return comment
+
+def request_swap(item_requested_id, item_offered_id, swap_method, shipping_address=None):
+    swap = Swap(
+        item_requested_id=item_requested_id,
+        item_offered_id=item_offered_id,
+        swap_method=SwapMethodEnum(swap_method),
+        shipping_address=shipping_address
+    )
+    db.session.add(swap)
+    db.session.commit()
+    return swap
+
+
+def add_requested_item(user_id, name, description):
+    item_request = RequestedItem(user_id=user_id, name=name, description=description)
+    db.session.add(item_request)
+    db.session.commit()
+    return item_request
+
+def get_requested_items(limit=50):
+    return RequestedItem.query.order_by(RequestedItem.created_at.desc()).limit(limit).all()
+
+def update_trust_score(user_id, score_delta):
+    user = User.query.get(user_id)
+    if user:
+        user.trust_score += score_delta
+        db.session.commit()
+    return user.trust_score

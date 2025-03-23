@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Swap{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h2>Request a Swap</h2>
+  <form method="POST">
+    <div class="form-group">
+      <label>Your Item</label>
+      <select name="item_offered_id" class="form-control" required>
+        {% for item in user_items %}
+          <option value="{{ item.id }}">{{ item.name }} - {{ item.condition.value }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Swap Method</label>
+      <select name="swap_method" class="form-control" required id="swap-method">
+        <option value="In Person">In Person Meetup</option>
+        <option value="Shipping">Shipping</option>
+        <option value="Online Payment">Online Payment</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="shipping-address-group" style="display:none;">
+      <label>Shipping Address</label>
+      <input type="text" name="shipping_address" class="form-control">
+    </div>
+
+    <button class="btn" type="submit">Request Swap</button>
+  </form>
+</div>
+
+<script>
+document.getElementById('swap-method').addEventListener('change', function() {
+    document.getElementById('shipping-address-group').style.display =
+        this.value === 'Shipping' ? 'block' : 'none';
+});
+</script>
+{% endblock %}

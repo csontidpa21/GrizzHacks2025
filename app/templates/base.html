@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}EcoSwap{% endblock %}</title>
     
+    <!-- Random Online Favicon -->
+    <link rel="icon" href="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/sign-check-icon.png">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
-    
+
     <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
@@ -23,16 +26,18 @@
             <ul class="nav-links">
                 <li><a href="{{ url_for('main.index') }}">Home</a></li>
                 {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                    <li><a href="{{ url_for('shop.request_queue') }}"><i class="fa-solid fa-list-check"></i> View Queue</a></li>
+                    <li><a href="{{ url_for('shop.new_post') }}"><i class="fa-solid fa-plus-circle"></i> Create Post</a></li>
+                    <li><a href="{{ url_for('shop.request_item') }}"><i class="fa-solid fa-box-open"></i> Request Item</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
-                    <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+                    <li><a href="{{ url_for('auth.login') }}"><i class="fa-solid fa-sign-in-alt"></i> Login</a></li>
+                    <li><a href="{{ url_for('auth.register') }}"><i class="fa-solid fa-user-plus"></i> Register</a></li>
                 {% endif %}
                 <li><button id="theme-toggle" class="btn-theme"><i class="fa-solid fa-moon"></i></button></li>
             </ul>
         </div>
     </nav>
-`    
 
     <main class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -42,7 +47,7 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        
+
         {% block content %}{% endblock %}
     </main>
 

@@ -10,7 +10,7 @@ bcrypt = Bcrypt()
 
 login_manager.login_view = 'auth.login'
 login_manager.login_message_category = 'info'
-
+login_manager.session_protection = "strong"
 
 # Authentication:
 # /api/auth/register

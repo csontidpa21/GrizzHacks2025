@@ -24,7 +24,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        
+
         user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         latitude, longitude = get_geoip_location(user_ip)
 
@@ -38,7 +38,7 @@ def register():
             )
             flash('Account created successfully!', 'success')
             login_user(user)
-            return redirect(url_for('shop.home'))  # Redirect to shop.home after registration
+            return redirect(url_for('shop.home'))
         except ValueError as e:
             flash(str(e), 'danger')
     return render_template('register.html', form=form)
@@ -47,14 +47,16 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = get_user_by_username(form.username.data)
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
             login_user(user)
             flash('Logged in successfully.', 'success')
-            return redirect(url_for('shop.home'))  # Redirect to shop.home after login
+            return redirect(url_for('shop.home'))
         else:
-            flash('Login unsuccessful. Please check email and password.', 'danger')
+            flash('Login unsuccessful. Please check username and password.', 'danger')
     return render_template('login.html', form=form)
+
+
 
 @auth.route('/logout')
 @login_required

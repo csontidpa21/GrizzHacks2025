@@ -23,11 +23,12 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(256), nullable=False)
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
-    preferences = db.Column(JSON, nullable=True)  # <-- updated to generic JSON
+    preferences = db.Column(JSON, nullable=True)
     gamification_points = db.Column(db.Integer, default=0, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     comments = db.relationship('Comment', backref='user', lazy='dynamic')
-    items = db.relationship('Item', backref='owner', lazy='dynamic')
+    items = db.relationship('Item', backref='owner', lazy='select')
+    trust_score = db.Column(db.Integer, default=100, nullable=False)
 
 class ItemConditionEnum(enum.Enum):
     NEW = 'New'
@@ -65,6 +66,11 @@ class SwapStatusEnum(enum.Enum):
     COMPLETED = 'Completed'
     CANCELLED = 'Cancelled'
 
+class SwapMethodEnum(enum.Enum):
+    IN_PERSON = 'In Person'
+    SHIPPING = 'Shipping'
+    ONLINE_PAYMENT = 'Online Payment'
+
 class Swap(db.Model):
     __tablename__ = 'swaps'
 
@@ -72,6 +78,9 @@ class Swap(db.Model):
     item_requested_id = db.Column(UUID(as_uuid=True), db.ForeignKey('items.id'), nullable=False)
     item_offered_id = db.Column(UUID(as_uuid=True), db.ForeignKey('items.id'), nullable=False)
     status = db.Column(Enum(SwapStatusEnum), default=SwapStatusEnum.PENDING, nullable=False)
+    swap_method = db.Column(Enum(SwapMethodEnum), nullable=False)
+    shipping_address = db.Column(db.String(256), nullable=True)
+    payment_info = db.Column(JSON, nullable=True)
     initiated_at = db.Column(db.DateTime, default=func.now(), nullable=False)
 
     item_requested = db.relationship('Item', foreign_keys=[item_requested_id])
@@ -85,3 +94,15 @@ class Comment(db.Model):
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
+
+class RequestedItem(db.Model):
+    __tablename__ = 'requested_items'
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=func.now())
+
+    # ADD THIS RELATIONSHIP
+    user = db.relationship('User', backref=db.backref('requested_items', lazy='dynamic'))

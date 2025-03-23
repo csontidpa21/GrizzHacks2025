@@ -11,7 +11,7 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login_manager.init_app(app)
     bcrypt.init_app(app)
-    login_manager.session_protection = "strong"
+    
     # Blueprints
     from .auth import auth
     from .routes import main
