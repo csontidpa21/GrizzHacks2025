@@ -1,8 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required
 import requests
-from .extensions import db, bcrypt
-from .models import User
+from .extensions import bcrypt
 from .forms import RegistrationForm, LoginForm
 from app.controller import create_user, get_user_by_username
 
